@@ -1,0 +1,266 @@
+/*
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2025 New Vector Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
+ * Please see LICENSE files in the repository root for full details.
+ */
+
+package cloud.orelit.communicationplatform.features.messages.impl.topbars
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.unit.dp
+import cloud.orelit.communicationplatform.compound.theme.ElementTheme
+import cloud.orelit.communicationplatform.compound.tokens.generated.CompoundIcons
+import cloud.orelit.communicationplatform.features.messages.impl.MessagesMenuActions
+import cloud.orelit.communicationplatform.features.messages.impl.SharedHistoryIcon
+import cloud.orelit.communicationplatform.features.roomcall.api.RoomCallState
+import cloud.orelit.communicationplatform.features.roomcall.api.aStandByCallState
+import cloud.orelit.communicationplatform.features.roomcall.api.anOngoingCallState
+import cloud.orelit.communicationplatform.libraries.designsystem.components.avatar.Avatar
+import cloud.orelit.communicationplatform.libraries.designsystem.components.avatar.AvatarData
+import cloud.orelit.communicationplatform.libraries.designsystem.components.avatar.AvatarSize
+import cloud.orelit.communicationplatform.libraries.designsystem.components.avatar.AvatarType
+import cloud.orelit.communicationplatform.libraries.designsystem.components.avatar.anAvatarData
+import cloud.orelit.communicationplatform.libraries.designsystem.components.button.BackButton
+import cloud.orelit.communicationplatform.libraries.designsystem.preview.ElementPreview
+import cloud.orelit.communicationplatform.libraries.designsystem.preview.PreviewsDayNight
+import cloud.orelit.communicationplatform.libraries.designsystem.preview.ROOM_NAME
+import cloud.orelit.communicationplatform.libraries.designsystem.theme.components.HorizontalDivider
+import cloud.orelit.communicationplatform.libraries.designsystem.theme.components.Icon
+import cloud.orelit.communicationplatform.libraries.designsystem.theme.components.TopAppBar
+import cloud.orelit.communicationplatform.libraries.matrix.api.encryption.identity.IdentityState
+import cloud.orelit.communicationplatform.libraries.matrix.api.user.DisplayedStatus
+import cloud.orelit.communicationplatform.libraries.matrix.ui.components.DisplayNameWithStatus
+import cloud.orelit.communicationplatform.libraries.matrix.ui.components.aMatrixUserList
+import cloud.orelit.communicationplatform.libraries.matrix.ui.model.getAvatarData
+import cloud.orelit.communicationplatform.libraries.ui.strings.CommonStrings
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun MessagesViewTopBar(
+    roomName: String?,
+    roomAvatar: AvatarData,
+    isTombstoned: Boolean,
+    heroes: ImmutableList<AvatarData>,
+    dmUserIdentityState: IdentityState?,
+    sharedHistoryIcon: SharedHistoryIcon,
+    dmUserStatus: DisplayedStatus?,
+    onRoomDetailsClick: () -> Unit,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    menuActions: @Composable RowScope.() -> Unit,
+) {
+    TopAppBar(
+        modifier = modifier.padding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal).asPaddingValues()),
+        navigationIcon = {
+            BackButton(onClick = onBackClick)
+        },
+        title = {
+            val roundedCornerShape = RoundedCornerShape(8.dp)
+            Row(
+                modifier = Modifier
+                    .heightIn(min = 48.dp)
+                    .clip(roundedCornerShape)
+                    .clickable { onRoomDetailsClick() }
+                    .semantics { heading() },
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                val titleModifier = Modifier.weight(1f, fill = false)
+                RoomAvatarAndNameRow(
+                    roomName = roomName,
+                    roomAvatar = roomAvatar,
+                    isTombstoned = isTombstoned,
+                    heroes = heroes,
+                    dmUserStatus = dmUserStatus,
+                    modifier = titleModifier
+                )
+
+                val iconModifier = Modifier.size(16.dp)
+
+                when (dmUserIdentityState) {
+                    IdentityState.Verified -> {
+                        Icon(
+                            modifier = iconModifier,
+                            imageVector = CompoundIcons.Verified(),
+                            tint = ElementTheme.colors.iconSuccessPrimary,
+                            contentDescription = null,
+                        )
+                    }
+                    IdentityState.VerificationViolation -> {
+                        Icon(
+                            modifier = iconModifier,
+                            imageVector = CompoundIcons.ErrorSolid(),
+                            tint = ElementTheme.colors.iconCriticalPrimary,
+                            contentDescription = null,
+                        )
+                    }
+                    else -> Unit
+                }
+
+                when (sharedHistoryIcon) {
+                    SharedHistoryIcon.NONE -> Unit
+                    SharedHistoryIcon.SHARED -> Icon(
+                        modifier = iconModifier,
+                        imageVector = CompoundIcons.History(),
+                        tint = ElementTheme.colors.iconInfoPrimary,
+                        contentDescription = stringResource(CommonStrings.common_shared_history),
+                    )
+                    SharedHistoryIcon.WORLD_READABLE -> Icon(
+                        modifier = iconModifier,
+                        imageVector = CompoundIcons.UserProfileSolid(),
+                        tint = ElementTheme.colors.iconInfoPrimary,
+                        contentDescription = stringResource(CommonStrings.common_world_readable_history),
+                    )
+                }
+            }
+        },
+        actions = menuActions,
+        windowInsets = WindowInsets(0.dp)
+    )
+}
+
+@Composable
+private fun RoomAvatarAndNameRow(
+    roomName: String?,
+    roomAvatar: AvatarData,
+    heroes: ImmutableList<AvatarData>,
+    isTombstoned: Boolean,
+    dmUserStatus: DisplayedStatus?,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Avatar(
+            avatarData = roomAvatar,
+            avatarType = AvatarType.Room(
+                heroes = heroes,
+                isTombstoned = isTombstoned,
+            ),
+        )
+        DisplayNameWithStatus(
+            name = roomName ?: stringResource(CommonStrings.common_no_room_name),
+            status = dmUserStatus,
+            modifier = Modifier.padding(start = 8.dp),
+            style = ElementTheme.typography.fontBodyLgMedium,
+            nameColor = ElementTheme.colors.textPrimary,
+            nameFontStyle = FontStyle.Italic.takeIf { roomName == null },
+        )
+    }
+}
+
+@PreviewsDayNight
+@Composable
+internal fun MessagesViewTopBarPreview() = ElementPreview {
+    @Composable
+    fun AMessagesViewTopBar(
+        roomName: String? = ROOM_NAME,
+        roomAvatar: AvatarData = anAvatarData(
+            name = ROOM_NAME,
+            size = AvatarSize.TimelineRoom,
+        ),
+        isTombstoned: Boolean = false,
+        heroes: ImmutableList<AvatarData> = persistentListOf(),
+        roomCallState: RoomCallState = RoomCallState.Unavailable,
+        dmUserIdentityState: IdentityState? = null,
+        sharedHistoryIcon: SharedHistoryIcon = SharedHistoryIcon.NONE,
+        dmUserStatus: DisplayedStatus? = null,
+        displayThreads: Boolean = false,
+    ) = MessagesViewTopBar(
+        roomName = roomName,
+        roomAvatar = roomAvatar,
+        isTombstoned = isTombstoned,
+        heroes = heroes,
+        dmUserIdentityState = dmUserIdentityState,
+        sharedHistoryIcon = sharedHistoryIcon,
+        dmUserStatus = dmUserStatus,
+        onRoomDetailsClick = {},
+        onBackClick = {},
+        menuActions = {
+            MessagesMenuActions(
+                roomCallState = roomCallState,
+                displayThreads = displayThreads,
+                onJoinCallClick = {},
+                onThreadsListClick = {},
+            )
+        }
+    )
+    Column {
+        AMessagesViewTopBar()
+        HorizontalDivider()
+        AMessagesViewTopBar(
+            heroes = aMatrixUserList().map { it.getAvatarData(AvatarSize.TimelineRoom) }.toImmutableList(),
+            roomCallState = anOngoingCallState(),
+        )
+        HorizontalDivider()
+        AMessagesViewTopBar(
+            roomName = null,
+            roomCallState = anOngoingCallState(canJoinCall = false),
+        )
+        HorizontalDivider()
+        AMessagesViewTopBar(
+            roomName = "A DM with a very very very long name",
+            roomAvatar = anAvatarData(
+                size = AvatarSize.TimelineRoom,
+                url = "https://some-avatar.jpg"
+            ),
+            roomCallState = aStandByCallState(canStartCall = false),
+            dmUserIdentityState = IdentityState.Verified
+        )
+        HorizontalDivider()
+        AMessagesViewTopBar(
+            roomName = "A DM with a very very very long name",
+            isTombstoned = true,
+            dmUserIdentityState = IdentityState.VerificationViolation
+        )
+        HorizontalDivider()
+        AMessagesViewTopBar(
+            roomName = "A DM with shared history",
+            dmUserIdentityState = IdentityState.Verified,
+            sharedHistoryIcon = SharedHistoryIcon.SHARED,
+        )
+        HorizontalDivider()
+        AMessagesViewTopBar(
+            roomName = "A room with world_readable history",
+            sharedHistoryIcon = SharedHistoryIcon.WORLD_READABLE,
+        )
+        HorizontalDivider()
+        AMessagesViewTopBar(
+            displayThreads = true,
+        )
+        HorizontalDivider()
+        AMessagesViewTopBar(
+            roomName = "A DM with a very very very long name",
+            dmUserIdentityState = IdentityState.Verified,
+            dmUserStatus = DisplayedStatus.InCall(0L)
+        )
+    }
+}

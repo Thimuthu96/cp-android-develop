@@ -1,0 +1,22 @@
+/*
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2022-2025 New Vector Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
+ * Please see LICENSE files in the repository root for full details.
+ */
+
+plugins {
+    id("cloud.orelit.communicationplatform-library")
+}
+
+android {
+    namespace = "cloud.orelit.communicationplatform.services.appnavstate.test"
+}
+
+dependencies {
+    api(projects.libraries.matrix.api)
+    api(projects.services.appnavstate.api)
+    implementation(libs.coroutines.core)
+    implementation(libs.androidx.lifecycle.runtime)
+}

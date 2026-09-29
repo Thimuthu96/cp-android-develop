@@ -1,0 +1,19 @@
+/*
+ * Copyright (c) 2026 Element Creations Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
+ * Please see LICENSE files in the repository root for full details.
+ */
+plugins {
+    id("cloud.orelit.communicationplatform-library")
+}
+
+android {
+    namespace = "cloud.orelit.communicationplatform.features.signedout.test"
+}
+
+dependencies {
+    implementation(projects.libraries.architecture)
+    implementation(projects.features.signedout.api)
+    implementation(projects.tests.testutils)
+}

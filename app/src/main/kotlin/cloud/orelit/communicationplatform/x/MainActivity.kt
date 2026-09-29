@@ -1,0 +1,180 @@
+/*
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2022-2025 New Vector Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
+ * Please see LICENSE files in the repository root for full details.
+ */
+
+package cloud.orelit.communicationplatform.x
+
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.bumble.appyx.core.integrationpoint.NodeActivity
+import com.bumble.appyx.core.plugin.NodeReadyObserver
+import cloud.orelit.communicationplatform.compound.colors.SemanticColorsLightDark
+import cloud.orelit.communicationplatform.compound.theme.ElementTheme
+import cloud.orelit.communicationplatform.features.lockscreen.api.LockScreenEntryPoint
+import cloud.orelit.communicationplatform.features.lockscreen.api.LockScreenLockState
+import cloud.orelit.communicationplatform.features.lockscreen.api.LockScreenService
+import cloud.orelit.communicationplatform.features.lockscreen.api.handleSecureFlag
+import cloud.orelit.communicationplatform.libraries.architecture.appyx.DebugNavStateNodeHost
+import cloud.orelit.communicationplatform.libraries.architecture.bindings
+import cloud.orelit.communicationplatform.libraries.core.log.logger.LoggerTag
+import cloud.orelit.communicationplatform.libraries.designsystem.theme.ElementThemeApp
+import cloud.orelit.communicationplatform.libraries.designsystem.utils.snackbar.LocalSnackbarDispatcher
+import cloud.orelit.communicationplatform.services.analytics.compose.LocalAnalyticsService
+import cloud.orelit.communicationplatform.x.di.AppBindings
+import cloud.orelit.communicationplatform.x.intent.SafeUriHandler
+import kotlinx.coroutines.launch
+import timber.log.Timber
+
+private val loggerTag = LoggerTag("MainActivity")
+
+class MainActivity : NodeActivity() {
+    private lateinit var mainNode: MainNode
+    private lateinit var appBindings: AppBindings
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.tag(loggerTag.value).d("onCreate, with savedInstanceState: ${savedInstanceState != null}")
+        installSplashScreen()
+        super.onCreate(savedInstanceState)
+        appBindings = bindings()
+        setupLockManagement(appBindings.lockScreenService(), appBindings.lockScreenEntryPoint())
+        enableEdgeToEdge()
+        setContent {
+            MainContent(appBindings)
+        }
+
+        val activity = this
+        appBindings.appStartupHooks().forEach {
+            lifecycleScope.launch {
+                it.onAppStartup(activity)
+            }
+        }
+    }
+
+    @Composable
+    private fun MainContent(appBindings: AppBindings) {
+        val migrationState = appBindings.migrationEntryPoint().present()
+        val colors by remember {
+            appBindings.enterpriseService().semanticColorsFlow(sessionId = null)
+        }.collectAsState(SemanticColorsLightDark.default)
+        ElementThemeApp(
+            appPreferencesStore = appBindings.preferencesStore(),
+            featureFlagService = appBindings.featureFlagService(),
+            compoundLight = colors.light,
+            compoundDark = colors.dark,
+            buildMeta = appBindings.buildMeta()
+        ) {
+            CompositionLocalProvider(
+                LocalSnackbarDispatcher provides appBindings.snackbarDispatcher(),
+                LocalUriHandler provides SafeUriHandler(this),
+                LocalAnalyticsService provides appBindings.analyticsService(),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(ElementTheme.colors.bgCanvasDefault),
+                ) {
+                    if (migrationState.migrationAction.isSuccess()) {
+                        MainNodeHost()
+                    } else {
+                        appBindings.migrationEntryPoint().Render(
+                            state = migrationState,
+                            modifier = Modifier,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun MainNodeHost() {
+        // TODO this is a temporary helper to capture the nav state in a more readable format for crash reports
+        // Revert to `NodeHost` once this is fixed
+        DebugNavStateNodeHost(integrationPoint = appyxV1IntegrationPoint) {
+            MainNode(
+                it,
+                plugins = listOf(
+                    object : NodeReadyObserver<MainNode> {
+                        override fun init(node: MainNode) {
+                            Timber.tag(loggerTag.value).d("onMainNodeInit")
+                            mainNode = node
+                            mainNode.handleIntent(intent)
+                        }
+                    },
+                ),
+                context = applicationContext
+            )
+        }
+    }
+
+    private fun setupLockManagement(
+        lockScreenService: LockScreenService,
+        lockScreenEntryPoint: LockScreenEntryPoint
+    ) {
+        lockScreenService.handleSecureFlag(this)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                lockScreenService.lockState.collect { state ->
+                    if (state == LockScreenLockState.Locked) {
+                        startActivity(lockScreenEntryPoint.pinUnlockIntent(this@MainActivity))
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Called when:
+     * - the launcher icon is clicked (if the app is already running);
+     * - a notification is clicked.
+     * - a deep link have been clicked
+     * - the app is going to background (<- this is strange)
+     */
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        Timber.tag(loggerTag.value).d("onNewIntent")
+        // If the mainNode is not init yet, keep the intent for later.
+        // It can happen when the activity is killed by the system. The methods are called in this order :
+        // onCreate(savedInstanceState=true) -> onNewIntent -> onResume -> onMainNodeInit
+        if (::mainNode.isInitialized) {
+            mainNode.handleIntent(intent)
+        } else {
+            setIntent(intent)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Timber.tag(loggerTag.value).d("onPause")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Timber.tag(loggerTag.value).d("onResume")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.tag(loggerTag.value).d("onDestroy")
+    }
+}

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2026 Element Creations Ltd.
+  ~
+  ~ SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
+  ~ Please see LICENSE files in the repository root for full details.
+  -->
+
+<resources>
+    <string name="start_searching_title">Start searching…</string>
+    <string name="start_searching_subtitle">Search for chats and messages</string>
+    <string name="search_section_chats">Chats</string>
+    <string name="search_from_your_messages_header">From your messages</string>
+    <string name="search_section_messages">Messages</string>
+    <string name="search_no_results_title">No results</string>
+    <string name="search_no_results_subtitle">There are no results for “%1$s”. Try a new search term.</string>
+    <string name="screen_home_tab_calendar">Calendar</string>
+    <string name="screen_calendar_today">Today</string>
+    <string name="screen_calendar_tomorrow">Tomorrow</string>
+    <string name="screen_calendar_all_day">All day</string>
+    <string name="screen_calendar_change_view">Change view</string>
+    <string name="screen_calendar_new_event">New event</string>
+    <string name="screen_calendar_view_agenda">Agenda</string>
+    <string name="screen_calendar_view_day">Day</string>
+    <string name="screen_calendar_view_three_day">3 days</string>
+    <string name="screen_calendar_view_week">Week</string>
+    <string name="screen_calendar_online_meeting">Online meeting</string>
+    <string name="screen_calendar_no_events_day">No events</string>
+    <string name="screen_calendar_empty_title">Nothing planned</string>
+    <string name="screen_calendar_empty_subtitle">Events from your calendar will show up here.</string>
+    <string name="screen_calendar_event_title_label">Title</string>
+    <string name="screen_calendar_event_title_hint">Add title</string>
+    <string name="screen_calendar_event_section_when">When</string>
+    <string name="screen_calendar_event_section_people">People</string>
+    <string name="screen_calendar_event_starts">Starts</string>
+    <string name="screen_calendar_event_ends">Ends</string>
+    <string name="screen_calendar_event_repeat">Repeat</string>
+    <string name="screen_calendar_event_add_people">Add people</string>
+    <string name="screen_calendar_event_description_hint">Add description</string>
+    <string name="screen_calendar_event_end_before_start">The event must end after it starts</string>
+    <string name="screen_calendar_event_discard_title">Discard event?</string>
+    <string name="screen_calendar_event_discard_message">The event you started will be lost.</string>
+    <string name="screen_calendar_event_sent">Your event is being created. You will be invited to it shortly.</string>
+    <string name="screen_calendar_event_created_some_not_invited">Event created, but some people could not be invited. You can invite them from its chat.</string>
+    <string name="screen_calendar_event_error_generic">The event could not be created. Try again.</string>
+    <string name="screen_calendar_event_error_not_configured">Creating events is not available yet.</string>
+    <string name="screen_calendar_event_error_bot_unavailable">The meetings service did not respond. Try again in a moment.</string>
+    <string name="screen_calendar_untitled_event">Untitled event</string>
+    <string name="screen_calendar_event_organizer">Organiser</string>
+    <string name="screen_calendar_event_description">Description</string>
+    <string name="screen_calendar_event_join_call">Join call</string>
+    <string name="screen_calendar_event_chat">Chat</string>
+    <string name="screen_calendar_event_copy_link">Copy link</string>
+    <string name="screen_calendar_event_link_copied">Meeting link copied</string>
+    <string name="screen_calendar_event_call_in_progress">Meeting in progress</string>
+    <string name="screen_calendar_event_error_no_room">This event has no meeting to join.</string>
+    <string name="screen_calendar_edit_event">Edit event</string>
+    <string name="screen_calendar_event_updated">Event updated</string>
+    <string name="screen_calendar_event_error_update">The event could not be updated. Try again.</string>
+    <string name="screen_calendar_event_error_load">The event could not be opened for editing. Try again.</string>
+    <string name="screen_calendar_cancel_event">Cancel event</string>
+    <string name="screen_calendar_keep_event">Keep event</string>
+    <string name="screen_calendar_cancel_event_title">Cancel event?</string>
+    <string name="screen_calendar_cancel_event_message">Everyone invited will see it as canceled. This can\'t be undone.</string>
+    <string name="screen_calendar_event_updated_some_not_updated">Event updated, but some people could not be invited or removed. You can manage them from its chat.</string>
+    <string name="screen_calendar_event_discard_changes_title">Discard changes?</string>
+    <string name="screen_calendar_event_discard_changes_message">Your changes will be lost.</string>
+    <string name="screen_calendar_cancel_occurrence">Cancel occurrence</string>
+    <string name="screen_calendar_cancel_occurrence_title">Cancel this occurrence?</string>
+    <string name="screen_calendar_cancel_occurrence_message">Everyone invited will see this occurrence as canceled. The rest of the series is kept. This can\'t be undone.</string>
+    <string name="screen_calendar_event_canceled">Event canceled</string>
+    <string name="screen_calendar_event_cancel_failed">Couldn\'t cancel the event</string>
+    <string name="screen_calendar_event_canceled_banner">This event has been canceled</string>
+    <string name="screen_calendar_event_canceled_title">Canceled: %1$s</string>
+    <string name="screen_calendar_scope_edit_title">Edit recurring event</string>
+    <string name="screen_calendar_scope_cancel_title">Cancel recurring event</string>
+    <string name="screen_calendar_scope_occurrence">This event</string>
+    <string name="screen_calendar_scope_series">Entire series</string>
+    <plurals name="screen_calendar_event_participants">
+        <item quantity="one">%1$d participant</item>
+        <item quantity="other">%1$d participants</item>
+    </plurals>
+    <string name="screen_calendar_repeat_none">Does not repeat</string>
+    <string name="screen_calendar_repeat_other">Repeats</string>
+    <string name="screen_calendar_repeat_daily">Every day</string>
+    <string name="screen_calendar_repeat_weekdays">Every weekday</string>
+    <string name="screen_calendar_repeat_weekly">Every week</string>
+    <string name="screen_calendar_repeat_monthly">Every month</string>
+    <string name="screen_calendar_repeat_yearly">Every year</string>
+</resources>

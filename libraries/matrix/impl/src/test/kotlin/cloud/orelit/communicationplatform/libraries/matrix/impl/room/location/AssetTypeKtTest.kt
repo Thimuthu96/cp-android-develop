@@ -1,0 +1,21 @@
+/*
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2024, 2025 New Vector Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
+ * Please see LICENSE files in the repository root for full details.
+ */
+
+package cloud.orelit.communicationplatform.libraries.matrix.impl.room.location
+
+import com.google.common.truth.Truth.assertThat
+import cloud.orelit.communicationplatform.libraries.matrix.api.room.location.AssetType
+import org.junit.Test
+
+class AssetTypeKtTest {
+    @Test
+    fun toInner() {
+        assertThat(AssetType.SENDER.into()).isEqualTo(org.matrix.rustcomponents.sdk.AssetType.SENDER)
+        assertThat(AssetType.PIN.into()).isEqualTo(org.matrix.rustcomponents.sdk.AssetType.PIN)
+    }
+}

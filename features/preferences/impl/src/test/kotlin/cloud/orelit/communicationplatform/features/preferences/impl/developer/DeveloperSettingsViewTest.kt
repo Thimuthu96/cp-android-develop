@@ -1,0 +1,116 @@
+/*
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2024, 2025 New Vector Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
+ * Please see LICENSE files in the repository root for full details.
+ */
+
+@file:OptIn(ExperimentalTestApi::class)
+
+package cloud.orelit.communicationplatform.features.preferences.impl.developer
+
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.AndroidComposeUiTest
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.v2.runAndroidComposeUiTest
+import cloud.orelit.communicationplatform.features.preferences.impl.R
+import cloud.orelit.communicationplatform.tests.testutils.EnsureNeverCalled
+import cloud.orelit.communicationplatform.tests.testutils.EventsRecorder
+import cloud.orelit.communicationplatform.tests.testutils.clickOn
+import cloud.orelit.communicationplatform.tests.testutils.ensureCalledOnce
+import cloud.orelit.communicationplatform.tests.testutils.pressBack
+import cloud.orelit.communicationplatform.tests.testutils.robolectric.RobolectricTest
+import org.junit.Test
+import org.robolectric.annotation.Config
+
+class DeveloperSettingsViewTest : RobolectricTest() {
+    @Test
+    fun `clicking on back invokes the expected callback`() = runAndroidComposeUiTest {
+        val eventsRecorder = EventsRecorder<DeveloperSettingsEvent>(expectEvents = false)
+        ensureCalledOnce {
+            setDeveloperSettingsView(
+                state = aDeveloperSettingsState(
+                    eventSink = eventsRecorder
+                ),
+                onBackClick = it
+            )
+            pressBack()
+        }
+    }
+
+    @Config(qualifiers = "h2400dp")
+    @Test
+    fun `clicking on push history notification invokes the expected callback`() = runAndroidComposeUiTest {
+        val eventsRecorder = EventsRecorder<DeveloperSettingsEvent>(expectEvents = false)
+        ensureCalledOnce {
+            setDeveloperSettingsView(
+                state = aDeveloperSettingsState(
+                    eventSink = eventsRecorder
+                ),
+                onPushHistoryClick = it
+            )
+            clickOn(R.string.troubleshoot_notifications_entry_point_push_history_title)
+        }
+    }
+
+    @Config(qualifiers = "h2400dp")
+    @Test
+    fun `clicking on push rules emits the expected event`() = runAndroidComposeUiTest {
+        val eventsRecorder = EventsRecorder<DeveloperSettingsEvent>()
+        setDeveloperSettingsView(
+            state = aDeveloperSettingsState(
+                eventSink = eventsRecorder
+            ),
+        )
+        onNodeWithText("Push rules").performScrollTo().performClick()
+        eventsRecorder.assertSingle(DeveloperSettingsEvent.OpenPushRules)
+    }
+
+    @Config(qualifiers = "h2000dp")
+    @Test
+    fun `clicking on open showkase invokes the expected callback`() = runAndroidComposeUiTest {
+        val eventsRecorder = EventsRecorder<DeveloperSettingsEvent>(expectEvents = false)
+        ensureCalledOnce {
+            setDeveloperSettingsView(
+                state = aDeveloperSettingsState(
+                    eventSink = eventsRecorder
+                ),
+                onOpenShowkase = it
+            )
+            onNodeWithText("Open Showkase browser").performClick()
+        }
+    }
+
+    @Config(qualifiers = "h2400dp")
+    @Test
+    fun `clicking on clear cache emits the expected event`() = runAndroidComposeUiTest {
+        val eventsRecorder = EventsRecorder<DeveloperSettingsEvent>()
+        setDeveloperSettingsView(
+            state = aDeveloperSettingsState(
+                eventSink = eventsRecorder
+            ),
+        )
+        onNodeWithText("Clear cache").performScrollTo().performClick()
+        eventsRecorder.assertSingle(DeveloperSettingsEvent.ClearCache)
+    }
+}
+
+private fun AndroidComposeUiTest<ComponentActivity>.setDeveloperSettingsView(
+    state: DeveloperSettingsState,
+    onOpenShowkase: () -> Unit = EnsureNeverCalled(),
+    onPushHistoryClick: () -> Unit = EnsureNeverCalled(),
+    onBackClick: () -> Unit = EnsureNeverCalled()
+) {
+    setContent {
+        DeveloperSettingsView(
+            state = state,
+            onOpenShowkase = onOpenShowkase,
+            onPushHistoryClick = onPushHistoryClick,
+            onBackClick = onBackClick,
+        )
+    }
+}

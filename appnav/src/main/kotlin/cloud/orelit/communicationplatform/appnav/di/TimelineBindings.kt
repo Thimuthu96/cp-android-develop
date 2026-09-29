@@ -1,0 +1,19 @@
+/*
+ * Copyright (c) 2025 Element Creations Ltd.
+ * Copyright 2025 New Vector Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
+ * Please see LICENSE files in the repository root for full details.
+ */
+
+package cloud.orelit.communicationplatform.appnav.di
+
+import cloud.orelit.communicationplatform.features.messages.api.pinned.PinnedEventsTimelineProvider
+import cloud.orelit.communicationplatform.libraries.matrix.api.timeline.TimelineProvider
+import cloud.orelit.communicationplatform.services.analytics.api.watchers.AnalyticsSendMessageWatcher
+
+interface TimelineBindings {
+    val timelineProvider: TimelineProvider
+    val pinnedEventsTimelineProvider: PinnedEventsTimelineProvider
+    val analyticsSendMessageWatcher: AnalyticsSendMessageWatcher
+}

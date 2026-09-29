@@ -1,0 +1,26 @@
+Freedom to communicate on your own terms
+
+For individuals and communities - private communication between family, friends, hobby groups, clubs, etc.
+
+Communication Platform gives you fast, secure and private instant messaging and video calls built on Matrix, the open standard for real-time communication.
+
+Stay in touch with friends, family and communities with:
+ • Real time messaging & video calls
+ • Public rooms for open group communication
+ • Private rooms for closed group communication
+ • Rich messaging features: emoji reactions, replies, polls, pinned messages and more.
+ • Video calling while browsing messages.
+ • Interoperability with other Matrix-based apps such as FluffyChat, Cinny and many more.
+
+<b>Privacy-first<b>
+Unlike some other messengers from Big Tech companies, we don’t mine your data or monitor your communications.
+
+<b>Own your conversations</b>
+Communication Platform connects to your organization’s own managed server, so your conversations stay on infrastructure you control rather than a third party’s. Built on Matrix, the open standard for real time communication, so you’re never locked into a single vendor’s protocol. You’re not the product. You’re in control.
+
+<b>Communicate in real time, all the time</b>
+Use Communication Platform everywhere. Stay in touch wherever you are with fully synchronised message history across all your devices.
+
+The application requires the android.permission.REQUEST_INSTALL_PACKAGES permission to enable the installation of applications received as attachments, ensuring seamless and convenient access to new software within the app.
+
+The application requires the USE_FULL_SCREEN_INTENT permission to ensure our users can effectively receive call notifications even when their devices are locked.
